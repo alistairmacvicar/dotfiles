@@ -24,17 +24,18 @@ set $menu wofi --show drun -i
 ## Monitor Configuration
 
 ```
-set $monitor1 eDP-2  # laptop screen
-set $monitor2 DP-11  # main monitor
-set $monitor3 DP-1
+set $monitor2 DP-3  # main monitor
+set $monitor3 HDMI-A-2 #secondary monitor
 
-output $monitor2 resolution 2560x1440 position 0,0
-output $monitor3 resolution 2560x1440 position 2560,0
+output $monitor2 resolution 3840x2560 position 0,0
+output $monitor3 resolution 1920x1080 position 3840,0
+
+output $monitor2 scale 2
 ```
 
-- Configures three monitors
-- Disables laptop screen when lid is closed
+- Configures the monitors
 - Sets resolution and position for external monitors
+- Scales the 4k monitor to keep pixel density but make everything larger on the screen
 
 ## Workspace Configuration
 
