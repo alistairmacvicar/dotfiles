@@ -115,3 +115,8 @@ Key features:
 - Swaps Discord with the currently focused window
 - Focuses Discord when swapped
 - Remembers the previous window for swapping back
+
+## TODO:
+- Change the login screen to just go straight to my sway environment with a pin
+- add mod+L to lock the screen when I'm away from the keyboard
+- add a hotkey to change the audio output back and forth between the speakers and headphones
