@@ -24,17 +24,20 @@ bindcode 133 exec $menu
 
 ### Monitor Configuration
 # laptop screen
-set $monitor1 eDP-2 
+# set $monitor1 eDP-2 
 # main monitor
-set $monitor2 DP-10
-set $monitor3 DP-1
+set $monitor2 DP-3
+set $monitor3 HDMI-A-2
 
 # Disable the laptop screen when the lid is closed
 bindswitch --reload --locked lid:on output $monitor1 disable 
 bindswitch --reload --locked lid:off output $monitor1 enable 
 
-output $monitor2 resolution 2560x1440 position 0,0
-output $monitor3 resolution 1920x1080 position 2560,0
+output $monitor2 resolution 3840x2160 position 0,0
+output $monitor3 resolution 1920x1080 position 1920,0
+
+output $monitor2 scale 2
+output $monitor3 scale 1
 
 ### Workspace configuration
 # Define workspaces
@@ -70,7 +73,7 @@ bindsym $mod+Shift+b exec ~/.config/sway/toggle_discord.sh
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg ~/Downloads/campsite.jpg fill
+output * bg ~/wallpapers/campfire.jpg fill
 #
 # Example configuration:
 #

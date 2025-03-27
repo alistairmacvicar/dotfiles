@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Enable Noisetorch
+Comment=Enables noisetorch's virtual microphone 
+Exec=noisetorch -i
+StartupNotify=false
+Terminal=false
