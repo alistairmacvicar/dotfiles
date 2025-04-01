@@ -1,0 +1,38 @@
+
+[global]
+    monitor = 1
+    font = Monaspace Argon 11
+    frame_width = 2
+    separator_height = 2
+    padding = 10
+    horizontal_padding = 10
+    corner_radius = 6
+
+    frame_color = "#BD93F9"
+    separator_color = frame
+    background = "#1E1E2E"
+    foreground = "#F8F8F2"
+
+    transparency = 0
+
+    origin = top-right
+    offset = (40,40)
+
+[urgency_low]
+    timeout = 5
+    background = "#1E1E2E"
+    foreground = "#A6ADC8"
+    frame_color = "#89B4FA"
+
+[urgency_normal]
+    timeout = 7
+    background = "#1E1E2E"
+    foreground = "#F8F8F2"
+    frame_color = "#BD93F9"
+
+[urgency_critical]
+    timeout = 0
+    background = "#1E1E2E"
+    foreground = "#F38BA8"
+    frame_color = "#F38BA8"
+
