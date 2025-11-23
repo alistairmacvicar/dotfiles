@@ -1,0 +1,12 @@
+#!/bin/bash
+
+choice=$(printf "Shutdown\nReboot\nSuspend\nLogout\nLock" | dmenu -i -p "Power")
+
+case "$choice" in
+    Shutdown) systemctl poweroff ;;
+    Reboot) systemctl reboot ;;
+    Suspend) systemctl suspend ;;
+    Logout) i3-msg exit ;;
+    Lock) i3lock ;;
+esac
+
