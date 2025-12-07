@@ -1,0 +1,35 @@
+#!/bin/bash
+# Watch for RuneLite window and manage the key remapper
+
+REMAPPER_SCRIPT="$HOME/.local/bin/runelite.py"
+REMAPPER_PID=""
+
+cleanup() {
+    if [ ! -z "$REMAPPER_PID" ]; then
+        echo "Stopping remapper (PID: $REMAPPER_PID)" >> /tmp/runelite-watcher.log
+        sudo kill $REMAPPER_PID 2>/dev/null
+    fi
+    exit 0
+}
+
+trap cleanup SIGINT SIGTERM
+
+while true; do
+    # Check if RuneLite window exists
+    WINDOW_ID=$(xdotool search --name "RuneLite" 2>/dev/null | head -1)
+    if [ ! -z "$WINDOW_ID" ] && [ -z "$REMAPPER_PID" ]; then
+        echo "RuneLite detected, starting key remapper..." >> /tmp/runelite-watcher.log
+        echo "Running: sudo python3 $REMAPPER_SCRIPT" >> /tmp/runelite-watcher.log
+        sudo python3 "$REMAPPER_SCRIPT" >> /tmp/runelite-watcher.log 2>&1 &
+        REMAPPER_PID=$!
+        echo "Started with PID: $REMAPPER_PID" >> /tmp/runelite-watcher.log
+    elif [ -z "$WINDOW_ID" ] && [ ! -z "$REMAPPER_PID" ]; then
+        echo "RuneLite closed, stopping key remapper..." >> /tmp/runelite-watcher.log
+        sudo kill $REMAPPER_PID 2>/dev/null
+        REMAPPER_PID=""
+    fi
+    
+    sleep 2
+done
+
+
