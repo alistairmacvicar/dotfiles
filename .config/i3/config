@@ -111,6 +111,9 @@ set $ws10 "10"
 set $monitor1 DP-0
 set $monitor2 HDMI-0
 
+# Change scaling on 4k monitor
+exec --no-startup-id xrandr --output HDMI-0 --mode 1920x1080
+
 # Set workspaces to outputs
 # terminal browser comms browser
 workspace $ws1 output $monitor1
