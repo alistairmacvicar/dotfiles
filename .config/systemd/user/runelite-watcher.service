@@ -1,0 +1,12 @@
+[Unit]
+Description=RuneLite Mouse Button Remapper Watcher
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/alistair-macvicar/dotfiles/.local/bin/runelite-watcher
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+

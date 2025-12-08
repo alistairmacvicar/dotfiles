@@ -111,6 +111,9 @@ set $ws10 "10"
 set $monitor1 DP-0
 set $monitor2 HDMI-0
 
+# Change scaling on 4k monitor
+exec --no-startup-id xrandr --output HDMI-0 --mode 1920x1080
+
 # Set workspaces to outputs
 # terminal browser comms browser
 workspace $ws1 output $monitor1
@@ -192,3 +195,6 @@ bindsym $mod+F4 exec --no-startup-id pactl set-default-sink alsa_output.usb-HP__
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
 bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
+bindsym $mod+Shift+S exec --no-startup-id ~/.local/bin/flameshot-snip
+
+exec --no-startup-id ~/.local/bin/disable-mouse-accel
