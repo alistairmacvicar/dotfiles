@@ -43,6 +43,10 @@ exec --no-startup-id picom -b
 # set the background on startup
 exec --no-startup-id feh --bg-scale ~/Pictures/backgrounds/cozy_room.png
 
+# move screens (work)
+exec --no-startup-id xrandr --output DP-4 --right-of DP-2
+exec --no-startup-id xrandr --output DP-2 --primary
+
 # change focus
 bindsym Mod1+$left focus left
 bindsym Mod1+$down focus down
@@ -108,8 +112,8 @@ set $ws9 "9"
 set $ws10 "10"
 
 # Set monitor outputs
-set $monitor1 DP-0
-set $monitor2 HDMI-0
+set $monitor1 DP-4
+set $monitor2 DP-2
 
 # Change scaling on 4k monitor
 exec --no-startup-id xrandr --output HDMI-0 --mode 1920x1080
@@ -125,6 +129,7 @@ workspace $ws4 output $monitor2
 exec --no-startup-id i3-msg 'workspace $ws1; exec kitty'
 exec --no-startup-id i3-msg 'workspace $ws2; exec firefox'
 exec --no-startup-id i3-msg 'workspace $ws3; exec teams-for-linux'
+exec --no-startup-id i3-msg 'workspace $ws3; exec webex'
 exec --no-startup-id i3-msg 'workspace $ws4; exec firefox'
 
 # switch to workspace

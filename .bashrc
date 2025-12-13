@@ -32,12 +32,7 @@ export LUA_PATH="./?.lua;./?/init.lua;./lua/?/init.lua;;"
 # Dotfiles management alias
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-# Ctrl+F for fzf directory navigation
-fzf_cd() {
-  cd $(find * -type d | fzf)
-}
-
-bind -x '"\C-f": fzf_cd'
+alias la="ls -la"
 
 # Ctrl+o to swap from headphones to speakers
 swap_audio_output() {
@@ -56,7 +51,45 @@ swap_audio_output() {
 bind -x '"\C-o": swap_audio_output'
 
 # Ctrl+t to open tmux-sessioniser
-tmux_sessioniser() {
-  ~/.local/bin/tmux-sessioniser
+tmux_sessionizer() {
+  ~/.local/bin/tmux-sessionizer
 }
-bind -x '"\C-t": tmux_sessioniser'
+bind -x '"\C-t": tmux-sessionizer'
+
+# Bitwarden wrapper function to auto-export session key
+bw() {
+  local BW_BIN=$(command -v bw)
+  
+  if [ "$1" = "login" ]; then
+    # Run bw login with all arguments
+    "$BW_BIN" "$@"
+    local login_status=$?
+    
+    # If login succeeded, unlock and export session key
+    if [ $login_status -eq 0 ]; then
+      echo "Login successful. Unlocking and exporting session key..."
+      export BW_SESSION=$("$BW_BIN" unlock --raw)
+      if [ -n "$BW_SESSION" ]; then
+        echo "BW_SESSION exported successfully"
+      fi
+    fi
+    return $login_status
+  else
+    # Pass through all other bw commands
+    "$BW_BIN" "$@"
+  fi
+}
+
+# Git-aware prompt
+parse_git_branch() {
+  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+# Prompt colors
+COLOR_RESET='\[\033[0m\]'
+COLOR_USER='\[\033[01;32m\]'      # Green
+COLOR_PATH='\[\033[01;34m\]'      # Blue
+COLOR_GIT='\[\033[01;33m\]'       # Yellow
+
+# Set prompt: user@host:path (git-branch) $
+PS1="${COLOR_USER}\u@\h${COLOR_RESET}:${COLOR_PATH}\w${COLOR_RESET} ${COLOR_GIT}\$(parse_git_branch)${COLOR_RESET}\$ "
