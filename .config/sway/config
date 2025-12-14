@@ -107,6 +107,14 @@ gaps outer 5
 # Stop the focus on hover (yuck)
 focus_follows_mouse no
 
+# Wine popup/dropdown menu fixes
+for_window [class="Wine" window_type="dropdown_menu"] floating enable
+for_window [class="Wine" window_type="popup_menu"] floating enable
+for_window [class="Wine" window_type="utility"] floating enable
+for_window [class="Wine" window_type="dialog"] floating enable
+for_window [class="Wine" window_type="splash"] floating enable
+for_window [class="Wine" window_type="toolbar"] floating enable
+
 ### Key bindings
 #
 # Basics:

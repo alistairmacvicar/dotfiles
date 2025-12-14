@@ -11,6 +11,14 @@ set $mod Mod1
 for_window [class="^.*"] border pixel 2
 for_window [class="^.*"] client.focused #77dd77 #285577 #ffffff #2e9ef4 #285577
 
+# Wine popup/dropdown menu fixes
+for_window [class="Wine" window_type="dropdown_menu"] floating enable
+for_window [class="Wine" window_type="popup_menu"] floating enable
+for_window [class="Wine" window_type="utility"] floating enable
+for_window [class="Wine" window_type="dialog"] floating enable
+for_window [class="Wine" window_type="splash"] floating enable
+for_window [class="Wine" window_type="toolbar"] floating enable
+
 # use Mouse+Mod1 to drag floating windows to their wanted position
 floating_modifier Mod1
 
@@ -193,8 +201,8 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
-# Audio system tray icon
-exec --no-startup-id pasystray
+# Volume control system tray icon
+exec --no-startup-id volumeicon
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -202,6 +210,7 @@ bindsym $mod+F1 exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% &
 bindsym $mod+F2 exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
 bindsym $mod+F3 exec --no-startup-id pactl set-default-sink alsa_output.usb-DELL_Dell_Speakerphone_SP3022_0-02.analog-stereo && $refresh_i3status
 bindsym $mod+F4 exec --no-startup-id pactl set-default-sink alsa_output.usb-HP__Inc_HyperX_Cloud_III_Wireless_0000000000000000-00.analog-stereo && $refresh_i3status
+bindsym $mod+Shift+a exec --no-startup-id ~/.local/bin/audio-switcher
 
 # dont think i need these but I'll leave them here in case
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
