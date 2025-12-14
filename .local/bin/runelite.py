@@ -46,6 +46,16 @@ def send_key_to_window(window_id, key):
     subprocess.run(["xdotool", "key", "--clearmodifiers", key])
 
 
+def send_keydown(window_id, key):
+    """Send a keydown event to a specific window."""
+    subprocess.run(["xdotool", "keydown", "--clearmodifiers", key])
+
+
+def send_keyup(window_id, key):
+    """Send a keyup event to a specific window."""
+    subprocess.run(["xdotool", "keyup", "--clearmodifiers", key])
+
+
 def disable_mouse_accel_on_virtual_device(device_name="mouse-passthrough", max_retries=10):
     """Disable mouse acceleration on the virtual passthrough device."""
     for attempt in range(max_retries):
@@ -116,8 +126,8 @@ def main():
 
     try:
         for event in mouse.read_loop():
-            # Check if it's a button press we want to intercept
-            if event.type == ecodes.EV_KEY and event.value == 1:
+            # Check if it's a button press or release we want to intercept
+            if event.type == ecodes.EV_KEY and event.value in [0, 1]:
                 window_id = get_active_window_id()
                 if window_id:
                     window_class = get_window_class(window_id)
@@ -125,11 +135,22 @@ def main():
 
                     # Check if it's RuneLite by window name
                     if window_name and "runelite" in window_name.lower():
+                        intercepted = False
+                        
                         if event.code == 275:  # Mouse button (back/forward)
-                            send_key_to_window(window_id, "space")
-                            continue  # Don't pass through this event
+                            if event.value == 1:  # Button pressed
+                                send_keydown(window_id, "space")
+                            else:  # Button released (value == 0)
+                                send_keyup(window_id, "space")
+                            intercepted = True
                         elif event.code == 276:  # Mouse button (back/forward)
-                            send_key_to_window(window_id, "Escape")
+                            if event.value == 1:  # Button pressed
+                                send_keydown(window_id, "Escape")
+                            else:  # Button released (value == 0)
+                                send_keyup(window_id, "Escape")
+                            intercepted = True
+                        
+                        if intercepted:
                             continue  # Don't pass through this event
 
             # Pass through all other events
