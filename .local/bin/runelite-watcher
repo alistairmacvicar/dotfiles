@@ -3,30 +3,55 @@
 
 REMAPPER_SCRIPT="$HOME/.local/bin/runelite.py"
 REMAPPER_PID=""
+LOG_FILE="/tmp/runelite-watcher.log"
+
+# Wait for X server to be ready
+echo "$(date): Waiting for X server..." >> "$LOG_FILE"
+while ! xdotool search --name "." &>/dev/null; do
+    sleep 1
+done
+echo "$(date): X server ready" >> "$LOG_FILE"
 
 cleanup() {
     if [ ! -z "$REMAPPER_PID" ]; then
-        echo "Stopping remapper (PID: $REMAPPER_PID)" >> /tmp/runelite-watcher.log
+        echo "$(date): Stopping remapper (PID: $REMAPPER_PID)" >> "$LOG_FILE"
         sudo kill $REMAPPER_PID 2>/dev/null
+        wait $REMAPPER_PID 2>/dev/null
     fi
     exit 0
 }
 
-trap cleanup SIGINT SIGTERM
+trap cleanup SIGINT SIGTERM EXIT
+
+# Function to check if process is actually running
+is_process_running() {
+    [ ! -z "$1" ] && kill -0 "$1" 2>/dev/null
+}
+
+echo "$(date): RuneLite watcher started" >> "$LOG_FILE"
 
 while true; do
     # Check if RuneLite window exists
     WINDOW_ID=$(xdotool search --name "RuneLite" 2>/dev/null | head -1)
-    if [ ! -z "$WINDOW_ID" ] && [ -z "$REMAPPER_PID" ]; then
-        echo "RuneLite detected, starting key remapper..." >> /tmp/runelite-watcher.log
-        echo "Running: sudo python3 $REMAPPER_SCRIPT" >> /tmp/runelite-watcher.log
-        sudo python3 "$REMAPPER_SCRIPT" >> /tmp/runelite-watcher.log 2>&1 &
-        REMAPPER_PID=$!
-        echo "Started with PID: $REMAPPER_PID" >> /tmp/runelite-watcher.log
-    elif [ -z "$WINDOW_ID" ] && [ ! -z "$REMAPPER_PID" ]; then
-        echo "RuneLite closed, stopping key remapper..." >> /tmp/runelite-watcher.log
-        sudo kill $REMAPPER_PID 2>/dev/null
+    
+    # Check if remapper process is still alive
+    if [ ! -z "$REMAPPER_PID" ] && ! is_process_running $REMAPPER_PID; then
+        echo "$(date): Remapper process died unexpectedly" >> "$LOG_FILE"
         REMAPPER_PID=""
+    fi
+    
+    if [ ! -z "$WINDOW_ID" ] && [ -z "$REMAPPER_PID" ]; then
+        echo "$(date): RuneLite detected, starting key remapper..." >> "$LOG_FILE"
+        echo "$(date): Running: sudo python3 $REMAPPER_SCRIPT" >> "$LOG_FILE"
+        sudo python3 "$REMAPPER_SCRIPT" >> "$LOG_FILE" 2>&1 &
+        REMAPPER_PID=$!
+        echo "$(date): Started with PID: $REMAPPER_PID" >> "$LOG_FILE"
+    elif [ -z "$WINDOW_ID" ] && [ ! -z "$REMAPPER_PID" ]; then
+        echo "$(date): RuneLite closed, stopping key remapper..." >> "$LOG_FILE"
+        sudo kill $REMAPPER_PID 2>/dev/null
+        wait $REMAPPER_PID 2>/dev/null
+        REMAPPER_PID=""
+        echo "$(date): Remapper stopped" >> "$LOG_FILE"
     fi
     
     sleep 2

@@ -111,3 +111,7 @@ COLOR_GIT='\[\033[01;33m\]'       # Yellow
 
 # Set prompt: user@host:path (git-branch) $
 PS1="${COLOR_USER}\u@\h${COLOR_RESET}:${COLOR_PATH}\w${COLOR_RESET} ${COLOR_GIT}\$(parse_git_branch)${COLOR_RESET}\$ "
+
+# Wine isolation - prevent Wine from intercepting native operations
+export WINEDLLOVERRIDES="winemenubuilder.exe=d"
+export WINE_DONT_USE_XDG_DIRECTORIES=1

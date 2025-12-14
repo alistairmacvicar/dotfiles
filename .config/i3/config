@@ -125,6 +125,10 @@ workspace $ws2 output $monitor1
 workspace $ws3 output $monitor2
 workspace $ws4 output $monitor2
 
+# Assign apps to workspaces (handles slow-loading apps)
+assign [class="teams-for-linux"] $ws3
+assign [class="Webex"] $ws3
+
 # Send apps to workspaces on startup
 exec --no-startup-id i3-msg 'workspace $ws1; exec kitty'
 exec --no-startup-id i3-msg 'workspace $ws2; exec firefox'
@@ -188,6 +192,9 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
+
+# Audio system tray icon
+exec --no-startup-id pasystray
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status

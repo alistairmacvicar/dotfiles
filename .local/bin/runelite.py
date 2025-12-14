@@ -1,6 +1,8 @@
 import os
 import subprocess
 import sys
+import time
+import threading
 
 from evdev import InputDevice, UInput, ecodes
 
@@ -44,6 +46,44 @@ def send_key_to_window(window_id, key):
     subprocess.run(["xdotool", "key", "--clearmodifiers", key])
 
 
+def disable_mouse_accel_on_virtual_device(device_name="mouse-passthrough", max_retries=10):
+    """Disable mouse acceleration on the virtual passthrough device."""
+    for attempt in range(max_retries):
+        try:
+            # Get list of xinput devices
+            result = subprocess.run(
+                ["xinput", "--list"], capture_output=True, text=True
+            )
+            
+            # Find device ID for our virtual device
+            for line in result.stdout.split('\n'):
+                if device_name in line and 'pointer' in line.lower():
+                    # Extract the device ID
+                    import re
+                    match = re.search(r'id=(\d+)', line)
+                    if match:
+                        device_id = match.group(1)
+                        print(f"Found virtual device ID: {device_id}")
+                        
+                        # Disable mouse acceleration (set to flat profile)
+                        subprocess.run(
+                            ["xinput", "--set-prop", device_id, 
+                             "libinput Accel Profile Enabled", "0", "1"],
+                            stderr=subprocess.DEVNULL
+                        )
+                        print(f"Disabled mouse acceleration on virtual device {device_id}")
+                        return True
+            
+            # Device not found yet, wait and retry
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"Error disabling mouse accel (attempt {attempt+1}): {e}")
+            time.sleep(0.5)
+    
+    print(f"Warning: Could not disable mouse acceleration on {device_name} after {max_retries} attempts")
+    return False
+
+
 def main():
     # Find mouse device
     mouse = None
@@ -69,6 +109,10 @@ def main():
     # Create a virtual input device to pass through events
     ui = UInput.from_device(mouse, name="mouse-passthrough")
     mouse.grab()  # Grab exclusive access
+    
+    # Disable mouse acceleration on the virtual device in a separate thread
+    accel_thread = threading.Thread(target=disable_mouse_accel_on_virtual_device, daemon=True)
+    accel_thread.start()
 
     try:
         for event in mouse.read_loop():
