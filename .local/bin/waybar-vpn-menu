@@ -1,0 +1,65 @@
+#!/bin/bash
+# Waybar VPN Menu - Compact version
+
+# Get active VPN
+active_vpn=$(nmcli connection show --active | grep -iE "vpn|wireguard|openvpn" | head -1 | awk '{print $1}')
+
+# Build compact menu
+MENU=""
+
+if [ -n "$active_vpn" ]; then
+    MENU="${MENU}  ${active_vpn}\n"
+    MENU="${MENU}  Disconnect\n"
+else
+    MENU="${MENU}  Not Connected\n"
+fi
+
+# List VPNs
+mapfile -t vpn_list < <(nmcli connection show | grep -iE "vpn|wireguard|openvpn")
+
+if [ ${#vpn_list[@]} -eq 0 ]; then
+    MENU="${MENU}  No VPNs Configured\n"
+else
+    for vpn in "${vpn_list[@]}"; do
+        vpn_name=$(echo "$vpn" | awk '{print $1}')
+        
+        if [ "$vpn_name" != "$active_vpn" ]; then
+            MENU="${MENU}  ${vpn_name}\n"
+        fi
+    done
+fi
+
+MENU="${MENU}  Add VPN\n"
+
+# Show menu
+CHOSEN=$(echo -e "$MENU" | rofi-menu 380 10 "VPN" far-right)
+
+[[ -z "$CHOSEN" ]] && exit 0
+
+# Handle selection
+case "$CHOSEN" in
+    *"Disconnect"*)
+        if [ -n "$active_vpn" ]; then
+            nmcli connection down "$active_vpn"
+            notify-send -u low "VPN" "Disconnected"
+        fi
+        ;;
+    *"Add VPN"*)
+        nm-connection-editor &
+        ;;
+    *"No VPNs"*|*"Not Connected"*)
+        ;;
+    *)
+        if [[ "$CHOSEN" =~ ^[[:space:]]* ]]; then
+            vpn_name=$(echo "$CHOSEN" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^  //')
+            [ "$vpn_name" = "$active_vpn" ] && exit 0
+            
+            notify-send -u low "VPN" "Connecting to $vpn_name..."
+            if nmcli connection up "$vpn_name" 2>/dev/null; then
+                notify-send -u low "VPN" "Connected"
+            else
+                notify-send -u critical "VPN" "Connection failed"
+            fi
+        fi
+        ;;
+esac

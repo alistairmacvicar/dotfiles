@@ -1,0 +1,108 @@
+* {
+    bg0: #1a1b26f5;
+    bg1: #16161ef0;
+    bg2: #283457;
+    bg3: #364A82;
+    
+    fg0: #c0caf5;
+    fg1: #565f89;
+    fg2: #7dcfff;
+    
+    border-col: #414868;
+    selected-col: #283457;
+    
+    background-color: transparent;
+    text-color: @fg0;
+    font: "JetBrainsMono Nerd Font 11";
+}
+
+window {
+    transparency: "real";
+    background-color: @bg0;
+    border: 2px;
+    border-color: @border-col;
+    border-radius: 12px;
+    width: 420px;
+    location: center;
+    y-offset: 200;
+}
+
+mainbox {
+    enabled: true;
+    spacing: 8px;
+    padding: 10px;
+    background-color: transparent;
+    children: [ "listview" ];
+}
+
+inputbar {
+    enabled: true;
+    spacing: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background-color: @bg1;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    enabled: true;
+    background-color: transparent;
+    text-color: @fg2;
+}
+
+entry {
+    enabled: true;
+    background-color: transparent;
+    text-color: @fg0;
+    placeholder: "Search...";
+    placeholder-color: @fg1;
+}
+
+listview {
+    enabled: true;
+    columns: 1;
+    lines: 10;
+    cycle: true;
+    dynamic: true;
+    scrollbar: false;
+    layout: vertical;
+    reverse: false;
+    fixed-height: false;
+    fixed-columns: true;
+    spacing: 2px;
+    padding: 4px 0px;
+    background-color: transparent;
+}
+
+element {
+    enabled: true;
+    spacing: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: transparent;
+    text-color: @fg0;
+}
+
+element selected.normal {
+    background-color: @selected-col;
+    text-color: @fg2;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+
+element-icon {
+    background-color: transparent;
+    size: 20px;
+}
+
+scrollbar {
+    enabled: true;
+    handle-width: 4px;
+    handle-color: @fg1;
+    background-color: transparent;
+    border-radius: 4px;
+}

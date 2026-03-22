@@ -1,0 +1,13 @@
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Papirus-Dark";
+    display-drun: "";
+    display-run: "";
+    display-window: "";
+    drun-display-format: "{name}";
+    font: "JetBrainsMono Nerd Font 11";
+    
+    /* Performance */
+    dpi: 1;
+}

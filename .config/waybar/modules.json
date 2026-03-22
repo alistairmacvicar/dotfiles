@@ -1,0 +1,79 @@
+{
+    "sway/workspaces": {
+        "disable-scroll": false,
+        "all-outputs": false,
+        "format": "{name}",
+        "format-icons": {
+            "urgent": "",
+            "focused": "",
+            "default": ""
+        }
+    },
+
+    "sway/window": {
+        "format": "{}",
+        "max-length": 50,
+        "tooltip": false
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "󰅶",
+            "deactivated": "󰾪"
+        },
+        "tooltip-format-activated": "Idle inhibitor active",
+        "tooltip-format-deactivated": "Idle inhibitor inactive"
+    },
+
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "󰖁",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "waybar-audio-menu",
+        "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "scroll-step": 5,
+        "tooltip-format": "Volume: {volume}%"
+    },
+
+    "network": {
+        "format-wifi": "󰖩 {essid}",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰖪",
+        "tooltip-format-wifi": "Connected to {essid} ({signalStrength}%)",
+        "tooltip-format-ethernet": "Connected via Ethernet",
+        "tooltip-format-disconnected": "Disconnected",
+        "on-click": "waybar-network-menu"
+    },
+
+    "custom/vpn": {
+        "format": "󰖂",
+        "exec": "waybar-vpn-status",
+        "interval": 5,
+        "on-click": "waybar-vpn-menu",
+        "tooltip": true
+    },
+
+    "custom/system-status": {
+        "format": "󰍛",
+        "exec": "waybar-system-status",
+        "interval": 5,
+        "on-click": "waybar-system-menu",
+        "tooltip": true
+    },
+
+    "clock": {
+        "format": "{:%H:%M | %d %b}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "on-click": "waybar-calendar-menu"
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "tooltip": true,
+        "tooltip-format": "Power Menu",
+        "on-click": "waybar-power-menu"
+    }
+}

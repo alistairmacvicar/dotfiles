@@ -1,50 +1,56 @@
-@define-color rosewater rgb(245, 224, 220);
-@define-color text      rgb(205, 214, 244);
-@define-color subtext1  rgb(186, 194, 222);
-@define-color subtext0  rgb(166, 173, 200);
-@define-color overlay2  rgb(147, 153, 178);
-@define-color overlay1  rgb(127, 132, 156);
-@define-color overlay0  rgb(108, 112, 134);
-@define-color surface2  rgb(88, 91, 112);
-@define-color surface1  rgb(69, 71, 90);
-@define-color surface0  rgb(49, 50, 68);
-@define-color base      rgb(30, 30, 46);
-@define-color mantle    rgb(24, 24, 37);
-@define-color crust     rgb(17, 17, 27);
-
 window {
-  background-color: @base;
-  opacity: 0.9;
-  color: @text;
-  border: 2px solid @rosewater;
+    background-color: rgba(26, 27, 38, 0.95);
+    color: #c0caf5;
+    border: 2px solid rgba(0, 0, 8, 0.8);
+    border-radius: 15px;
+    font-family: "JetBrainsMono Nerd Font", "JetBrainsMono NFP";
+    font-size: 15px;
 }
 
 #input {
-  background-color: @surface0;
-  color: @rosewater;
-  border: 1px solid @overlay0;
+    background-color: rgba(0, 0, 8, 0.7);
+    color: #c0caf5;
+    border: none;
+    border-radius: 10px;
+    padding: 8px;
+    margin: 5px;
 }
 
 #inner-box {
-  background-color: @base;
+    background-color: transparent;
+    padding: 5px;
 }
 
 #outer-box {
-  background-color: @base;
+    background-color: transparent;
+    padding: 5px;
 }
 
 #scroll {
-  background-color: @base;
+    background-color: transparent;
 }
 
 #text {
-  color: @text;
+    color: #c0caf5;
+    padding: 5px;
+}
+
+#entry {
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 5px 10px;
+    margin: 2px;
 }
 
 #entry:selected {
-  background-color: @rosewater;
+    background-color: rgba(0, 0, 8, 0.9);
+    color: #89b4fa;
+}
+
+#entry:hover {
+    background-color: rgba(0, 0, 8, 0.7);
 }
 
 #text:selected {
-  color: @base;
+    color: #89b4fa;
 }

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-choice=$(printf "Shutdown\nReboot\nSuspend\nLogout\nLock" | dmenu -i -p "Power")
+choice=$(printf "Shutdown\nReboot\nSuspend\nLogout\nLock" | rofi -dmenu -i -p "Power" -theme ~/.config/rofi/theme.rasi -theme-str 'mainbox {children: [ "inputbar", "listview" ];}' -theme-str 'window {location: center; anchor: north; y-offset: -150;}')
 
 case "$choice" in
     Shutdown) systemctl poweroff ;;
     Reboot) systemctl reboot ;;
     Suspend) systemctl suspend ;;
-    Logout) i3-msg exit ;;
-    Lock) i3lock ;;
+    Logout) swaymsg exit ;;
+    Lock) swaylock -f -c 000000 ;;
 esac
 

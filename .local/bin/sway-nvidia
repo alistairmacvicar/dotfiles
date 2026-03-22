@@ -1,0 +1,23 @@
+#!/bin/bash
+# Launch Sway with NVIDIA-specific environment variables
+
+# Fix missing cursor on NVIDIA GPUs
+export WLR_NO_HARDWARE_CURSORS=1
+
+# Use NVIDIA drivers
+export LIBVA_DRIVER_NAME=nvidia
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+
+# Enable GBM backend (required for NVIDIA 495+)
+export GBM_BACKEND=nvidia-drm
+export __GL_GSYNC_ALLOWED=0
+export __GL_VRR_ALLOWED=0
+
+# Wayland-specific
+export MOZ_ENABLE_WAYLAND=1
+export QT_QPA_PLATFORM=wayland
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=sway
+
+# Launch Sway with unsupported GPU flag
+exec sway --unsupported-gpu

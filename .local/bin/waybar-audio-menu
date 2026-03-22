@@ -1,0 +1,115 @@
+#!/bin/bash
+# Waybar Audio Menu - Compact version
+
+# Get current audio state
+current_vol=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+%' | head -1 | tr -d '%')
+is_muted=$(pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes' && echo "yes" || echo "no")
+current_sink=$(pactl get-default-sink)
+current_source=$(pactl get-default-source)
+
+# Build compact menu
+MENU=""
+
+# Volume controls
+if [ "$is_muted" = "yes" ]; then
+    MENU="${MENU}  Volume: MUTED\n"
+    MENU="${MENU}  Unmute\n"
+else
+    MENU="${MENU}  Volume: ${current_vol}%\n"
+    MENU="${MENU}  Increase Volume (+5%)\n"
+    MENU="${MENU}  Decrease Volume (-5%)\n"
+    MENU="${MENU}  Mute\n"
+fi
+
+# Output devices
+mapfile -t sinks < <(pactl list sinks short)
+if [ ${#sinks[@]} -gt 1 ]; then
+    for sink in "${sinks[@]}"; do
+        sink_id=$(echo "$sink" | awk '{print $1}')
+        sink_name=$(echo "$sink" | awk '{print $2}')
+        friendly_name=$(pactl list sinks | grep -A 20 "Sink #$sink_id" | grep "Description:" | cut -d: -f2- | sed 's/^[[:space:]]*//')
+        
+        if [ "$sink_name" = "$current_sink" ]; then
+            MENU="${MENU}  ${friendly_name}\n"
+        else
+            MENU="${MENU}  ${friendly_name}\n"
+        fi
+    done
+fi
+
+# Input devices
+mapfile -t sources < <(pactl list sources short | grep -v "monitor")
+if [ ${#sources[@]} -gt 1 ]; then
+    for source in "${sources[@]}"; do
+        source_id=$(echo "$source" | awk '{print $1}')
+        source_name=$(echo "$source" | awk '{print $2}')
+        friendly_name=$(pactl list sources | grep -A 20 "Source #$source_id" | grep "Description:" | cut -d: -f2- | sed 's/^[[:space:]]*//')
+        
+        if [ "$source_name" = "$current_source" ]; then
+            MENU="${MENU}  ${friendly_name}\n"
+        else
+            MENU="${MENU}  ${friendly_name}\n"
+        fi
+    done
+fi
+
+# Sound settings option
+MENU="${MENU}  Sound Settings\n"
+
+# Show menu
+CHOSEN=$(echo -e "$MENU" | rofi-menu 420 15 "Audio" far-right)
+
+# Exit if nothing selected
+[[ -z "$CHOSEN" ]] && exit 0
+
+# Handle selection
+case "$CHOSEN" in
+    *"Increase Volume"*)
+        pactl set-sink-volume @DEFAULT_SINK@ +5%
+        ;;
+    *"Decrease Volume"*)
+        pactl set-sink-volume @DEFAULT_SINK@ -5%
+        ;;
+    *"Mute"*)
+        pactl set-sink-mute @DEFAULT_SINK@ 1
+        ;;
+    *"Unmute"*)
+        pactl set-sink-mute @DEFAULT_SINK@ 0
+        ;;
+    *"Sound Settings"*)
+        pavucontrol &
+        ;;
+    *)
+        # Check if it's an output device
+        if [[ "$CHOSEN" == *"" ]] || [[ "$CHOSEN" == *"" ]]; then
+            device_name=$(echo "$CHOSEN" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^  //')
+            
+            while IFS= read -r sink; do
+                sink_id=$(echo "$sink" | awk '{print $1}')
+                friendly_name=$(pactl list sinks | grep -A 20 "Sink #$sink_id" | grep "Description:" | cut -d: -f2- | sed 's/^[[:space:]]*//')
+                
+                if [ "$friendly_name" = "$device_name" ]; then
+                    pactl set-default-sink "$sink_id"
+                    notify-send -u low "Audio" "Output: $device_name"
+                    break
+                fi
+            done < <(pactl list sinks short)
+        fi
+        
+        # Check if it's an input device
+        if [[ "$CHOSEN" == *"" ]] || [[ "$CHOSEN" == *"" ]]; then
+            device_name=$(echo "$CHOSEN" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^  //')
+            
+            while IFS= read -r source; do
+                source_id=$(echo "$source" | awk '{print $1}')
+                friendly_name=$(pactl list sources | grep -A 20 "Source #$source_id" | grep "Description:" | cut -d: -f2- | sed 's/^[[:space:]]*//')
+                
+                if [ "$friendly_name" = "$device_name" ]; then
+                    pactl set-default-source "$source_id"
+                    notify-send -u low "Audio" "Input: $device_name"
+                    break
+                fi
+            done < <(pactl list sources short | grep -v "monitor")
+        fi
+        ;;
+esac

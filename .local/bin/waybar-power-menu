@@ -1,0 +1,49 @@
+#!/bin/bash
+# Waybar Power Menu - GNOME Style
+# Polished power management interface
+
+# Menu options with descriptive icons
+MENU="  Lock Screen
+  Log Out
+  Suspend
+  Reboot System
+  Power Off"
+
+# Show menu
+CHOSEN=$(echo -e "$MENU" | rofi-menu 360 5 "Power Options" far-right)
+
+# Exit if nothing selected
+[[ -z "$CHOSEN" ]] && exit 0
+
+# Confirmation dialog for destructive actions
+confirm() {
+    local action="$1"
+    local message="$2"
+    
+    echo -e "  Yes\n  No" | rofi-menu 320 2 "$message" far-right
+}
+
+# Handle selection
+case "$CHOSEN" in
+    *"Lock"*)
+        swaylock -f -c 000000
+        ;;
+    *"Log Out"*)
+        if [[ $(confirm "logout" "Log out of session?") == *"Yes"* ]]; then
+            swaymsg exit
+        fi
+        ;;
+    *"Suspend"*)
+        systemctl suspend
+        ;;
+    *"Reboot"*)
+        if [[ $(confirm "reboot" "Reboot the system?") == *"Yes"* ]]; then
+            systemctl reboot
+        fi
+        ;;
+    *"Power Off"*)
+        if [[ $(confirm "poweroff" "Shut down the system?") == *"Yes"* ]]; then
+            systemctl poweroff
+        fi
+        ;;
+esac

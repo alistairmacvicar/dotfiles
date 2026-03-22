@@ -1,0 +1,49 @@
+#!/bin/bash
+# Waybar Calendar Menu - Compact version
+
+# Get date/time info
+current_date=$(date +"%A, %B %d, %Y")
+current_time=$(date +"%I:%M %p")
+timezone=$(date +"%Z")
+week_number=$(date +"%V")
+
+# Get calendar
+cal_output=$(cal -m | tail -n +2)
+
+# Build compact menu
+MENU="  ${current_date}
+  ${current_time} ${timezone} | Week ${week_number}
+"
+
+# Add calendar
+while IFS= read -r line; do
+    MENU="${MENU}  ${line}\n"
+done <<< "$cal_output"
+
+MENU="${MENU}  World Clock
+  Date & Time Settings"
+
+# Show menu
+CHOSEN=$(echo -e "$MENU" | rofi-menu 420 13 "Calendar" far-right)
+
+[[ -z "$CHOSEN" ]] && exit 0
+
+# Handle selection
+case "$CHOSEN" in
+    *"Date & Time Settings"*)
+        if command -v gnome-control-center &> /dev/null; then
+            gnome-control-center datetime &
+        else
+            notify-send "Calendar" "Settings not available"
+        fi
+        ;;
+    *"World Clock"*)
+        WORLD_MENU="  New York: $(TZ='America/New_York' date '+%H:%M')
+  London: $(TZ='Europe/London' date '+%H:%M')
+  Paris: $(TZ='Europe/Paris' date '+%H:%M')
+  Tokyo: $(TZ='Asia/Tokyo' date '+%H:%M')
+  Sydney: $(TZ='Australia/Sydney' date '+%H:%M')"
+        
+        echo -e "$WORLD_MENU" | rofi-menu 350 5 "World Clock" far-right
+        ;;
+esac

@@ -1,104 +1,134 @@
-@import "mocha.css";
-
 * {
-  font-family: FantasqueSansMono Nerd Font;
-  font-size: 14px;
-  min-height: 0;
+    /* JetBrainsMono Nerd Font is required to be installed for icons */
+    font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    transition: background-color .3s ease-out;
 }
 
-#waybar {
-  background-color: shade(@base, 0.9);
-  opacity: 0.8;
-  color: @text;
-  margin: 4px 4px;
+window#waybar {
+    background: rgba(26, 27, 38, 0.75);
+    color: #c0caf5;
+    font-family: "JetBrainsMono Nerd Font";
+    transition: background-color .5s;
 }
 
-#workspaces {
-  border-radius: 1rem;
-  margin: 5px;
-  background-color: @surface0;
-  margin-left: 1rem;
+.modules-left,
+.modules-center,
+.modules-right
+{
+    background: rgba(0, 0, 8, .7);
+    margin: 5px 10px;
+    padding: 0 5px;
+    border-radius: 15px;
 }
+.modules-left {
+    padding: 0;
+}
+.modules-center {
+    padding: 0 10px;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#wireplumber,
+#custom-media,
+#tray,
+#mode,
+#idle_inhibitor,
+#scratchpad,
+#power-profiles-daemon,
+#language,
+#mpd,
+#custom-system-status,
+#custom-vpn,
+#custom-power {
+    padding: 0 8px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
 
 #workspaces button {
-  color: @lavender;
-  border-radius: 1rem;
-  padding: 0.4rem;
+  background: transparent;
+  font-family: "JetBrainsMono Nerd Font";
+  font-weight: 900;
+  font-size: 13pt;
+  color: #c0caf5;
+  border:none;
+  border-radius: 15px;
 }
 
+#workspaces button.focused,
 #workspaces button.active {
-  color: @sky;
-  border-radius: 1rem;
+    background: #13131d;
+    color: #89b4fa;
 }
 
 #workspaces button:hover {
-  color: @sapphire;
-  border-radius: 1rem;
+  background: #11111b;
+  color: #cdd6f4;
+  box-shadow: none;
 }
 
-#custom-music,
-#tray,
-#backlight,
-#clock,
-#battery,
-#pulseaudio,
-#custom-lock,
+#custom-system-status {
+    color: #c0caf5;
+    font-size: 22px;
+    padding-left: 7px;
+    padding-right: 11px;
+}
+
+#custom-system-status:hover {
+    color: #d0daf5;
+}
+
+#custom-vpn {
+    color: #c0caf5;
+    font-size: 22px;
+    padding-left: 5px;
+    padding-right: 11px;
+}
+
+#custom-vpn:hover {
+    color: #d0daf5;
+}
+
 #custom-power {
-  background-color: @surface0;
-  padding: 0.5rem 1rem;
-  margin: 5px 0;
+    color: #c0caf5;
+    font-size: 20px;
+    padding-left: 5px;
+    padding-right: 11px;
 }
 
-#clock {
-  color: @blue;
-  border-radius: 0px 1rem 1rem 0px;
-  margin-right: 1rem;
+#custom-power:hover {
+    color: #d0daf5;
 }
 
-#battery {
-  color: @green;
-}
-
-#battery.charging {
-  color: @green;
-}
-
-#battery.warning:not(.charging) {
-  color: @red;
-}
-
-#backlight {
-  color: @yellow;
-}
-
-#backlight,
-#battery {
-  border-radius: 0;
+#network {
+    color: #c0caf5;
+    font-size: 22px;
+    padding-left: 6px;
+    padding-right: 10px;
 }
 
 #pulseaudio {
-  color: @maroon;
-  border-radius: 1rem 0px 0px 1rem;
-  margin-left: 1rem;
+    color: #c0caf5;
+    font-size: 24px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
-#custom-music {
-  color: @mauve;
-  border-radius: 1rem;
-}
-
-#custom-lock {
-  border-radius: 1rem 0px 0px 1rem;
-  color: @lavender;
-}
-
-#custom-power {
-  margin-right: 1rem;
-  border-radius: 0px 1rem 1rem 0px;
-  color: @red;
-}
-
-#tray {
-  margin-right: 1rem;
-  border-radius: 1rem;
+#clock {
+    color: #c0caf5;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 0 4px;
+    margin: 0;
 }

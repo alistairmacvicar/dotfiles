@@ -36,6 +36,10 @@ bindsym Mod1+Return exec kitty
 # kill focused window
 bindsym Mod1+Shift+q kill
 
+# force kill focused window (for stubborn apps like Webex)
+bindsym Mod1+Shift+x exec --no-startup-id i3-msg '[id="$(xdotool getactivewindow)"]' kill
+bindsym Mod1+Ctrl+Shift+q exec --no-startup-id xkill
+
 # start dmenu (a program launcher)
 bindsym Mod1+Shift+d exec --no-startup-id dmenu_run
 

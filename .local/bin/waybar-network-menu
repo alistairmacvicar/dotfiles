@@ -1,0 +1,112 @@
+#!/bin/bash
+# Waybar Network Menu - Compact version
+
+# Get network status
+wifi_device=$(nmcli device | grep wifi | awk '{print $1}' | head -1)
+wifi_status=$(nmcli -t -f DEVICE,STATE device | grep "$wifi_device" | cut -d: -f2)
+current_ssid=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+ethernet_status=$(nmcli device | grep ethernet | grep -c connected)
+wifi_signal=$(nmcli -t -f active,signal dev wifi | grep '^yes' | cut -d: -f2)
+
+# Build compact menu
+MENU=""
+
+# Current connection status
+if [ "$wifi_status" = "connected" ]; then
+    MENU="${MENU}  ${current_ssid} (${wifi_signal}%)\n"
+    MENU="${MENU}  Disconnect WiFi\n"
+elif [ "$ethernet_status" -gt 0 ]; then
+    MENU="${MENU}  Ethernet Connected\n"
+else
+    MENU="${MENU}  Enable WiFi\n"
+fi
+
+MENU="${MENU}  Scan Networks\n"
+
+# List available networks (top 8)
+mapfile -t networks < <(nmcli -t -f SSID,SIGNAL,SECURITY,IN-USE dev wifi list | sort -t: -k2 -rn | head -8)
+
+for network in "${networks[@]}"; do
+    IFS=: read -r ssid signal security in_use <<< "$network"
+    [ -z "$ssid" ] && continue
+    
+    # Icon and signal indicator
+    if [ "$in_use" = "*" ]; then
+        icon=""
+    elif [ -n "$security" ]; then
+        icon=""
+    else
+        icon=""
+    fi
+    
+    if [ "$signal" -ge 75 ]; then
+        strength="▂▄▆█"
+    elif [ "$signal" -ge 50 ]; then
+        strength="▂▄▆"
+    elif [ "$signal" -ge 25 ]; then
+        strength="▂▄"
+    else
+        strength="▂"
+    fi
+    
+    MENU="${MENU}${icon} ${ssid} ${strength}\n"
+done
+
+MENU="${MENU}  Network Settings\n"
+
+# Show menu
+CHOSEN=$(echo -e "$MENU" | rofi-menu 450 15 "Network" far-right)
+
+[[ -z "$CHOSEN" ]] && exit 0
+
+# Handle selection
+case "$CHOSEN" in
+    *"Disconnect WiFi"*)
+        nmcli device disconnect "$wifi_device"
+        notify-send -u low "Network" "WiFi disconnected"
+        ;;
+    *"Enable WiFi"*)
+        nmcli radio wifi on
+        sleep 1
+        nmcli device connect "$wifi_device"
+        notify-send -u low "Network" "WiFi enabled"
+        ;;
+    *"Scan Networks"*)
+        nmcli device wifi rescan
+        notify-send -u low "Network" "Scanning..."
+        sleep 2
+        "$0" &
+        ;;
+    *"Network Settings"*)
+        nm-connection-editor &
+        ;;
+    *)
+        if [[ "$CHOSEN" =~ ^[[:space:]]*(|)[[:space:]]+([^[:space:]]+) ]]; then
+            ssid=$(echo "$CHOSEN" | sed 's/^[[:space:]]*[[:space:]]\+//' | awk '{print $1}')
+            [ "$ssid" = "$current_ssid" ] && exit 0
+            
+            security=$(nmcli -t -f SSID,SECURITY dev wifi list | grep "^${ssid}:" | cut -d: -f2)
+            
+            if [ -n "$security" ]; then
+                password=$(rofi -dmenu -password -p "Password for $ssid" \
+                    -theme ~/.config/rofi/theme.rasi \
+                    -theme-str 'window {width: 380px; location: south; y-offset: -52;}' \
+                    -theme-str 'listview {enabled: false;}' <<< "")
+                
+                if [ -n "$password" ]; then
+                    if nmcli device wifi connect "$ssid" password "$password" 2>/dev/null; then
+                        notify-send -u low "Network" "Connected to $ssid"
+                    else
+                        notify-send -u critical "Network" "Failed to connect"
+                    fi
+                fi
+            else
+                if nmcli device wifi connect "$ssid" 2>/dev/null; then
+                    notify-send -u low "Network" "Connected to $ssid"
+                else
+                    notify-send -u critical "Network" "Failed to connect"
+                fi
+            fi
+        fi
+        ;;
+esac

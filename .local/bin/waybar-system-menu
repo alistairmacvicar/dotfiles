@@ -1,0 +1,64 @@
+#!/bin/bash
+# Waybar System Menu - Compact version
+
+# Get system info
+cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{printf "%.0f", 100 - $1}')
+mem_used=$(free -h | awk '/^Mem:/ {print $3}')
+mem_total=$(free -h | awk '/^Mem:/ {print $2}')
+mem_percent=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100}')
+disk_used=$(df -h / | awk 'NR==2 {print $3}')
+disk_total=$(df -h / | awk 'NR==2 {print $2}')
+disk_percent=$(df -h / | awk 'NR==2 {print $5}')
+uptime_info=$(uptime -p | sed 's/up //')
+load_avg=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | tr -d ',')
+
+# Temperature
+temp="N/A"
+if [ -f "/sys/class/hwmon/hwmon0/temp1_input" ]; then
+    temp=$(cat /sys/class/hwmon/hwmon0/temp1_input 2>/dev/null | awk '{printf "%.0f°C", $1/1000}')
+elif command -v sensors &> /dev/null; then
+    temp=$(sensors | grep -m1 "Core 0" | awk '{print $3}' | tr -d '+')
+fi
+
+# GPU info
+gpu_info=""
+if command -v nvidia-smi &> /dev/null; then
+    gpu_usage=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1)
+    gpu_temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1)
+    if [ -n "$gpu_usage" ]; then
+        gpu_info="  GPU: ${gpu_usage}% | ${gpu_temp}°C\n"
+    fi
+fi
+
+# Build compact menu
+MENU="  CPU: ${cpu_usage}% | Load: ${load_avg} | ${temp}
+  RAM: ${mem_used}/${mem_total} (${mem_percent}%)
+  Disk: ${disk_used}/${disk_total} (${disk_percent})
+"
+
+[ -n "$gpu_info" ] && MENU="${MENU}${gpu_info}"
+
+MENU="${MENU}  Uptime: ${uptime_info}
+  Task Manager
+  System Monitor"
+
+# Show menu
+CHOSEN=$(echo -e "$MENU" | rofi-menu 500 8 "System" far-right)
+
+[[ -z "$CHOSEN" ]] && exit 0
+
+# Handle selection
+case "$CHOSEN" in
+    *"Task Manager"*)
+        kitty -e htop &
+        ;;
+    *"System Monitor"*)
+        if command -v gnome-system-monitor &> /dev/null; then
+            gnome-system-monitor &
+        elif command -v btop &> /dev/null; then
+            kitty -e btop &
+        else
+            kitty -e htop &
+        fi
+        ;;
+esac

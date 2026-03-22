@@ -1,0 +1,14 @@
+#!/bin/bash
+# VPN status indicator
+
+# Check for active VPN connections
+vpn_active=$(nmcli connection show --active | grep -i "vpn\|wireguard\|openvpn" | wc -l)
+
+if [ "$vpn_active" -gt 0 ]; then
+    vpn_name=$(nmcli connection show --active | grep -i "vpn\|wireguard\|openvpn" | head -1 | awk '{print $1}')
+    echo "VPN On"
+    echo "VPN: $vpn_name"
+else
+    echo "VPN Off"
+    echo "VPN: Disconnected"
+fi

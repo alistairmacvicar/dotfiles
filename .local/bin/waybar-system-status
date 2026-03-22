@@ -1,0 +1,27 @@
+#!/bin/bash
+# System status indicator - shows icon based on load
+
+# Thresholds
+CPU_THRESHOLD=80
+MEM_THRESHOLD=80
+TEMP_THRESHOLD=75
+
+# Get values
+cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{printf "%.0f", 100 - $1}')
+mem_usage=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100}')
+
+# Check if temp sensor exists
+if [ -f "/sys/class/hwmon/hwmon0/temp1_input" ]; then
+    temp=$(cat /sys/class/hwmon/hwmon0/temp1_input 2>/dev/null | awk '{printf "%.0f", $1/1000}')
+else
+    temp=0
+fi
+
+# Determine status
+if [ "$cpu_usage" -gt "$CPU_THRESHOLD" ] || [ "$mem_usage" -gt "$MEM_THRESHOLD" ] || [ "$temp" -gt "$TEMP_THRESHOLD" ]; then
+    echo "System !"  # Warning
+    echo "HIGH LOAD - CPU: ${cpu_usage}% | RAM: ${mem_usage}% | Temp: ${temp}°C"
+else
+    echo "System"  # Normal
+    echo "CPU: ${cpu_usage}% | RAM: ${mem_usage}% | Temp: ${temp}°C"
+fi

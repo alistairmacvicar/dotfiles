@@ -1,0 +1,72 @@
+#!/bin/bash
+# Helper script to show rofi menus positioned intelligently
+# Usage: rofi-menu [width] [lines] [prompt] [position]
+#   position: left, center, right, far-right (default: center)
+
+WIDTH=${1:-420}
+LINES=${2:-10}
+PROMPT=${3:-"Menu"}
+POSITION=${4:-center}
+
+# Waybar height and desired offset from bottom
+# Position menus directly above waybar with minimal gap
+WAYBAR_HEIGHT=42
+MENU_GAP=5  # Small gap between waybar and menu
+Y_OFFSET=$((-(WAYBAR_HEIGHT + MENU_GAP)))
+
+# Calculate X offset based on position
+case "$POSITION" in
+    left)
+        # Left side of screen
+        X_OFFSET=100
+        LOCATION="southwest"
+        ;;
+    far-left)
+        # Leftmost of right-side modules (for clock)
+        X_OFFSET=-450
+        LOCATION="southeast"
+        ;;
+    left-center)
+        # Left-center of right-side modules (for system status)
+        X_OFFSET=-350
+        LOCATION="southeast"
+        ;;
+    center-left)
+        # Center-left of right-side modules (for VPN)
+        X_OFFSET=-250
+        LOCATION="southeast"
+        ;;
+    right)
+        # Right side of screen - closer to center/middle (for network)
+        X_OFFSET=-150
+        LOCATION="southeast"
+        ;;
+    center-right)
+        # Center-right of right-side modules (for audio)
+        X_OFFSET=-100
+        LOCATION="southeast"
+        ;;
+    far-right)
+        # Far right corner of screen (for power)
+        X_OFFSET=-10
+        LOCATION="southeast"
+        ;;
+    center)
+        # Center of screen
+        X_OFFSET=0
+        LOCATION="south"
+        ;;
+    *)
+        X_OFFSET=0
+        LOCATION="south"
+        ;;
+esac
+
+# Read from stdin and display with rofi
+rofi -dmenu \
+    -i \
+    -p "$PROMPT" \
+    -theme ~/.config/rofi/theme.rasi \
+    -theme-str "window {width: ${WIDTH}px; location: ${LOCATION}; x-offset: ${X_OFFSET}; y-offset: ${Y_OFFSET};}" \
+    -theme-str "listview {lines: ${LINES};}" \
+    -no-custom
